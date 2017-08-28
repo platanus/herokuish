@@ -1,11 +1,14 @@
 version: 2
 jobs:
   build:
-    machine: true
+    docker:
+      - image: circleci/golang:1.8.3
     working_directory: ~/gliderlabs/herokuish
     parallelism: 4
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 17.06.1-ce
       - run: |
           make circleci
       - run: |
@@ -17,13 +20,11 @@ jobs:
       - run: |
           make lint
       - run: |
-          ls -la /.circleci-task-data/circle-test-results/
-      - run: |
           case $CIRCLE_NODE_INDEX in 0) basht tests/**/tests.sh ;; esac
       - run: |
-          circleci tests glob buildpacks/*/tests/*/test.sh | circleci tests split --split-by=timings --timings-type=filename
+          circleci tests glob buildpacks/*/tests/*/test.sh | circleci tests split --split-by=timings --timings-type=classname
       - run: |
-          basht $(circleci tests glob buildpacks/*/tests/*/test.sh | circleci tests split --split-by=timings --timings-type=filename)
+          basht $(circleci tests glob buildpacks/*/tests/*/test.sh | circleci tests split --split-by=timings --timings-type=classname)
       - run: |
           ls -la /.circleci-task-data/circle-test-results/
       - deploy:
