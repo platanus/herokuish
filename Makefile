@@ -58,7 +58,12 @@ deps:
 test:
 	basht tests/*/tests.sh
 
-circleci:
+deb-setup:
+	@echo "-> Updating deb repository and installing build requirements"
+	@sudo apt-get update -qq
+	@sudo DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true apt-get install -qq -y python-software-properties
+
+circleci: deb-setup
 	docker version
 	rm -f ~/.gitconfig
 	mv Dockerfile.dev Dockerfile
