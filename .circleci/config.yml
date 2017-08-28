@@ -1,0 +1,22 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    working_directory: ~/gliderlabs/herokuish
+    parallelism: 4
+    steps:
+      - checkout
+      - run: |
+          make circleci
+      - run: |
+          make deps
+      - run: |
+          make shellcheck
+      - run: |
+          make build
+      - run: |
+          make lint
+      - run: |
+          case $CIRCLE_NODE_INDEX in 0) basht tests/**/tests.sh ;; esac
+      - run: |
+          basht $(circleci tests glob buildpacks/*/tests/*/test.sh | circleci tests split --split-by=timings --timings-type=filename)
