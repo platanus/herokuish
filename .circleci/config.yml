@@ -19,4 +19,6 @@ jobs:
       - run: |
           case $CIRCLE_NODE_INDEX in 0) basht tests/**/tests.sh ;; esac
       - run: |
+          circleci tests glob buildpacks/*/tests/*/test.sh | circleci tests split --split-by=timings --timings-type=filename
+      - run: |
           basht $(circleci tests glob buildpacks/*/tests/*/test.sh | circleci tests split --split-by=timings --timings-type=filename)
